@@ -35,8 +35,8 @@ export default function Home() {
   const [pdfResult, setPdfResult] = useState<string>('');
   const [currentModelName, setCurrentModelName] = useState<string>('');
   const [pdfPaths, setPdfPaths] = useState<string[]>([]);
-  const [objective, setObjective] = useState<string>('');
-  const [currentItems, setCurrentItems] = useState<string>('');
+  const [objective, setObjective] = useState<string>(''); // Initialize with empty string
+  const [currentItems, setCurrentItems] = useState<string>(''); // Initialize with empty string
   const [pdfDocuments, setPdfDocuments] = useState<string[]>([]);
   const [boundingBoxes, setBoundingBoxes] = useState<BoundingBox[]>([]);
   const [rawDetections, setRawDetections] = useState<any[]>([]);
@@ -103,7 +103,7 @@ export default function Home() {
       setCapturedImage(imageData);
       setRawDetections([]); // Clear previous detections
       setBoundingBoxes([]); // Clear previous boxes
-      
+
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: {
@@ -182,7 +182,7 @@ export default function Home() {
     setPdfDocuments(paths);
   };
 
-  const handleBoxSelect = (index: number) => {
+  const handleBoxClick = (index: number) => {
     setSelectedBoxes(prev => {
       if (prev.includes(index)) {
         return prev.filter(i => i !== index);
@@ -194,167 +194,73 @@ export default function Home() {
     });
   };
 
-  // Add debug logs
-  console.log('Response result:', result);
-  
-  // Add debug log in render
-  console.log('Rendering with currentModelName:', currentModelName);
-
-  // Add this before the return statement
-  console.log('Current model name for PDFButton:', currentModelName);
-
   return (
-    <div className={styles.container}>
+    <div className={styles.page}>
       <Head>
         <title>Camera Gemini App</title>
-        <meta name="description" content="Camera app with Gemini AI integration" />
-        <link rel="icon" href="/favicon.ico" />
+        <meta name="description" content="Camera app with Gemini integration" />
       </Head>
 
       <main className={styles.main}>
-        <ProjectStatus 
-          objective={objective}
-          currentItems={currentItems}
-          pdfDocuments={pdfDocuments}
-        />
+        <section className={styles.section}>
+          <h1 className={styles.title}>Project Status</h1>
+          <ProjectStatus 
+            currentModelName={currentModelName}
+            objective={objective}
+            currentItems={currentItems}
+          />
+        </section>
 
-        <NextStepButton
-          objective={objective}
-          currentItems={currentItems}
-          pdfDocuments={pdfDocuments}
-        />
-
-        <ProjectDetails
-          objective={objective}
-          currentItems={currentItems}
-          pdfDocuments={pdfDocuments}
-          onObjectiveChange={setObjective}
-          onCurrentItemsChange={setCurrentItems}
-        />
-
-        {/* Show PDFs at the top when they exist */}
-        {pdfPaths.length > 0 && (
-          <div className={styles.pdfSection}>
-            <h2>Device Datasheets</h2>
-            <PDFViewer pdfPaths={pdfPaths} />
-          </div>
-        )}
-
-        {/* Camera and results section */}
-        <div className={styles.mainSection}>
-          <CameraComponent onCapture={handleImageCapture} />
+        <section className={styles.section}>
+          <h2 className={styles.title}>Camera Feed</h2>
+          <CameraComponent onImageCapture={handleImageCapture} />
           {capturedImage && (
-            <div className={styles.detectionResults}>
-              <div className={styles.imageContainer} style={{ position: 'relative' }}>
-                <img 
-                  ref={imageRef}
-                  src={capturedImage} 
-                  alt="Captured" 
-                  style={{ 
-                    maxWidth: '100%',
-                    display: 'block',
-                    margin: '0 auto'
-                  }} 
-                  onLoad={handleImageLoad}
-                />
-                {boundingBoxes.length > 0 ? (
-                  <>
-                    <svg
-                      style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        pointerEvents: 'none'
-                      }}
-                      preserveAspectRatio="none"
-                    >
-                      {boundingBoxes.map((box, index) => {
-                        console.log(`Drawing box ${index}:`, box);
-                        return (
-                          <g key={index}>
-                            <rect
-                              x={`${box.box_2d.x1 * 100}%`}
-                              y={`${box.box_2d.y1 * 100}%`}
-                              width={`${(box.box_2d.x2 - box.box_2d.x1) * 100}%`}
-                              height={`${(box.box_2d.y2 - box.box_2d.y1) * 100}%`}
-                              fill="none"
-                              stroke={selectedBoxes.includes(index) ? 'red' : 'green'}
-                              strokeWidth="2"
-                            />
-                            <text
-                              x={`${box.box_2d.x1 * 100}%`}
-                              y={`${box.box_2d.y1 * 100 - 1}%`}
-                              fill={selectedBoxes.includes(index) ? 'red' : 'green'}
-                              fontSize="12px"
-                              fontWeight="bold"
-                              style={{
-                                filter: 'drop-shadow(1px 1px 1px rgba(0,0,0,0.7))'
-                              }}
-                            >
-                              {box.label}
-                            </text>
-                          </g>
-                        );
-                      })}
-                      {selectedBoxes.length === 2 && (
-                        <line
-                          x1={`${(boundingBoxes[selectedBoxes[0]].box_2d.x1 + boundingBoxes[selectedBoxes[0]].box_2d.x2) * 50}%`}
-                          y1={`${(boundingBoxes[selectedBoxes[0]].box_2d.y1 + boundingBoxes[selectedBoxes[0]].box_2d.y2) * 50}%`}
-                          x2={`${(boundingBoxes[selectedBoxes[1]].box_2d.x1 + boundingBoxes[selectedBoxes[1]].box_2d.x2) * 50}%`}
-                          y2={`${(boundingBoxes[selectedBoxes[1]].box_2d.y1 + boundingBoxes[selectedBoxes[1]].box_2d.y2) * 50}%`}
-                          stroke="blue"
-                          strokeWidth="2"
-                        />
-                      )}
-                    </svg>
-                    <div className={styles.boxSelection}>
-                      <h3>Select Boxes to Connect ({boundingBoxes.length} objects detected):</h3>
-                      <select
-                        multiple
-                        value={selectedBoxes.map(String)}
-                        onChange={(e) => {
-                          const selectedOptions = Array.from(e.target.selectedOptions, option => parseInt(option.value));
-                          setSelectedBoxes(selectedOptions.slice(0, 2));
-                        }}
-                        className={styles.boxSelector}
-                      >
-                        {boundingBoxes.map((box, index) => (
-                          <option key={index} value={index}>
-                            {box.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </>
-                ) : (
-                  <div className={styles.noDetections}>
-                    Analyzing image for objects...
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-          {currentModelName && (
-            <div className={styles.modelInfo}>
-              <p>Model Name: {currentModelName}</p>
-              <PDFButton 
-                modelName={currentModelName} 
-                onComplete={handlePdfComplete}
+            <div className={styles.imageContainer}>
+              <img
+                ref={imageRef}
+                src={capturedImage}
+                alt="Captured"
+                onLoad={handleImageLoad}
               />
+              {boundingBoxes.map((box, index) => (
+                <div
+                  key={index}
+                  className={`${styles.boundingBox} ${selectedBoxes.includes(index) ? styles.selected : ''}`}
+                  style={{
+                    left: `${box.box_2d.x1 * 100}%`,
+                    top: `${box.box_2d.y1 * 100}%`,
+                    width: `${(box.box_2d.x2 - box.box_2d.x1) * 100}%`,
+                    height: `${(box.box_2d.y2 - box.box_2d.y1) * 100}%`
+                  }}
+                  onClick={() => handleBoxClick(index)}
+                >
+                  <span className={styles.label}>{box.label}</span>
+                </div>
+              ))}
             </div>
           )}
-          <ResultComponent result={result} />
-        </div>
+        </section>
 
-        {/* Optional: Show raw PDF search results at the bottom */}
-        {pdfResult && (
-          <div className={styles.pdfResult}>
-            <h3>PDF Search Results:</h3>
-            <pre>{pdfResult}</pre>
-          </div>
-        )}
+        <section className={styles.section}>
+          <h2 className={styles.title}>Results</h2>
+          <ResultComponent result={result} />
+        </section>
+
+        <section className={styles.section}>
+          <h2 className={styles.title}>Project Details</h2>
+          <ProjectDetails 
+            objective={objective}
+            currentItems={currentItems}
+            pdfDocuments={pdfPaths}
+            onObjectiveChange={setObjective}
+            onCurrentItemsChange={setCurrentItems}
+          />
+        </section>
+
+        <div className={styles.ctas}>
+          <NextStepButton onClick={() => {}} className={styles.button} />
+          <PDFButton onPDFsLoaded={handlePdfComplete} className={`${styles.button} ${styles.secondary}`} />
+        </div>
       </main>
     </div>
   );

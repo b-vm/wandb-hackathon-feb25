@@ -2,16 +2,27 @@ import React from 'react';
 import styles from '../styles/ProjectStatus.module.css';
 
 interface ProjectStatusProps {
-  objective: string;
-  currentItems: string;
-  pdfDocuments: string[];
+  currentModelName?: string;
+  objective?: string;
+  currentItems?: string;
+  pdfDocuments?: string[];
 }
 
-export default function ProjectStatus({ objective, currentItems, pdfDocuments }: ProjectStatusProps) {
+export default function ProjectStatus({ 
+  currentModelName = '', 
+  objective = '', 
+  currentItems = '', 
+  pdfDocuments = [] 
+}: ProjectStatusProps) {
   return (
     <div className={styles.statusContainer}>
       <div className={styles.statusSection}>
-        <h2>Project Status</h2>
+        {currentModelName && (
+          <div className={styles.statusItem}>
+            <strong>Current Model:</strong>
+            <p>{currentModelName}</p>
+          </div>
+        )}
         <div className={styles.statusItem}>
           <strong>User's Desired Objective:</strong>
           <p>{objective || 'Not set'}</p>
@@ -35,4 +46,4 @@ export default function ProjectStatus({ objective, currentItems, pdfDocuments }:
       </div>
     </div>
   );
-} 
+}

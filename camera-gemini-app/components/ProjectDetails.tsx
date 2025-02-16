@@ -2,19 +2,19 @@ import React from 'react';
 import styles from '../styles/ProjectDetails.module.css';
 
 interface ProjectDetailsProps {
-  objective: string;
-  currentItems: string;
-  pdfDocuments: string[];
-  onObjectiveChange: (value: string) => void;
-  onCurrentItemsChange: (value: string) => void;
+  objective?: string;
+  currentItems?: string;
+  pdfDocuments?: string[];
+  onObjectiveChange?: (value: string) => void;
+  onCurrentItemsChange?: (value: string) => void;
 }
 
 export default function ProjectDetails({
-  objective,
-  currentItems,
-  pdfDocuments,
-  onObjectiveChange,
-  onCurrentItemsChange
+  objective = '',
+  currentItems = '',
+  pdfDocuments = [],
+  onObjectiveChange = () => {},
+  onCurrentItemsChange = () => {}
 }: ProjectDetailsProps) {
   return (
     <div className={styles.container}>
@@ -52,4 +52,4 @@ export default function ProjectDetails({
       )}
     </div>
   );
-} 
+}

@@ -1,95 +1,132 @@
 .page {
-  --gray-rgb: 0, 0, 0;
-  --gray-alpha-200: rgba(var(--gray-rgb), 0.08);
-  --gray-alpha-100: rgba(var(--gray-rgb), 0.05);
-
-  --button-primary-hover: #383838;
-  --button-secondary-hover: #f2f2f2;
-
-  display: grid;
-  grid-template-rows: 20px 1fr 20px;
-  align-items: center;
-  justify-items: center;
-  min-height: 100svh;
-  padding: 80px;
-  gap: 64px;
-  font-family: var(--font-geist-sans);
+  --text-color: #111;
+  --bg-color: #fff;
+  --border-color: #eee;
+  --accent-color: #0070f3;
+  
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  color: var(--text-color);
+  background: var(--bg-color);
 }
 
 @media (prefers-color-scheme: dark) {
   .page {
-    --gray-rgb: 255, 255, 255;
-    --gray-alpha-200: rgba(var(--gray-rgb), 0.145);
-    --gray-alpha-100: rgba(var(--gray-rgb), 0.06);
-
-    --button-primary-hover: #ccc;
-    --button-secondary-hover: #1a1a1a;
+    --text-color: #fff;
+    --bg-color: #111;
+    --border-color: #222;
+    --accent-color: #3291ff;
   }
 }
 
 .main {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  grid-row-start: 2;
+  gap: 2rem;
 }
 
-.main ol {
-  font-family: var(--font-geist-mono);
-  padding-left: 0;
-  margin: 0;
-  font-size: 14px;
-  line-height: 24px;
-  letter-spacing: -0.01em;
-  list-style-position: inside;
+.section {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
 }
 
-.main li:not(:last-of-type) {
-  margin-bottom: 8px;
+.title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  color: var(--text-color);
 }
 
-.main code {
-  font-family: inherit;
-  background: var(--gray-alpha-100);
-  padding: 2px 4px;
+.imageContainer {
+  position: relative;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.imageContainer img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.boundingBox {
+  position: absolute;
+  border: 2px solid var(--accent-color);
+  background: rgba(0, 112, 243, 0.1);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.boundingBox:hover {
+  opacity: 0.8;
+}
+
+.boundingBox.selected {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.label {
+  position: absolute;
+  top: -24px;
+  left: 0;
+  background: var(--accent-color);
+  color: white;
+  padding: 2px 6px;
   border-radius: 4px;
-  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  border: 1px solid var(--border-color);
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
+.button:hover {
+  background: var(--border-color);
 }
 
 .ctas {
   display: flex;
-  gap: 16px;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
-.ctas a {
-  appearance: none;
-  border-radius: 128px;
-  height: 48px;
-  padding: 0 20px;
-  border: none;
-  border: 1px solid transparent;
-  transition:
-    background 0.2s,
-    color 0.2s,
-    border-color 0.2s;
-  cursor: pointer;
+.status {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  line-height: 20px;
-  font-weight: 500;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: var(--border-radius);
+  background: var(--gray-alpha-200);
+  margin: 0.5rem 0;
 }
 
-a.primary {
-  background: var(--foreground);
-  color: var(--background);
-  gap: 8px;
+.status.success {
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--success-color);
 }
 
-a.secondary {
-  border-color: var(--gray-alpha-200);
-  min-width: 180px;
+.status.error {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error-color);
 }
 
 .footer {
@@ -240,33 +277,6 @@ a.secondary {
   display: flex;
   flex-direction: column;
   gap: 20px;
-}
-
-.imageContainer {
-  width: 100%;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  overflow: hidden;
-  position: relative;
-  min-height: 200px;
-}
-
-.imageContainer img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.noDetections {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 10px 20px;
-  border-radius: 20px;
-  font-size: 14px;
 }
 
 .boxSelection {
