@@ -1,0 +1,19 @@
+.resultContainer {
+  width: 100%;
+  height: 50vh;
+  padding: 20px;
+  overflow-y: auto;
+  background: #ffffff;
+}
+
+.resultText {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.placeholder {
+  color: #666;
+  text-align: center;
+  margin-top: 20px;
+} 
