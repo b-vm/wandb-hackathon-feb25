@@ -1,12 +1,15 @@
 import React from 'react';
 import styles from '../styles/ProjectDetails.module.css';
+import VoiceInput from './VoiceInput';
 
 interface ProjectDetailsProps {
   objective: string;
   currentItems: string;
   pdfDocuments: string[];
-  onObjectiveChange: (value: string) => void;
-  onCurrentItemsChange: (value: string) => void;
+  onObjectiveChange: (objective: string) => void;
+  onCurrentItemsChange: (items: string) => void;
+  capturedImage?: string;
+  detectedItems?: string[];
 }
 
 export default function ProjectDetails({
@@ -14,38 +17,43 @@ export default function ProjectDetails({
   currentItems,
   pdfDocuments,
   onObjectiveChange,
-  onCurrentItemsChange
+  onCurrentItemsChange,
+  capturedImage,
+  detectedItems,
 }: ProjectDetailsProps) {
+  const handleVoiceInput = (text: string) => {
+    onObjectiveChange(text);
+  };
+
   return (
     <div className={styles.container}>
-      <div className={styles.inputGroup}>
+      <div className={styles.section}>
         <label htmlFor="objective">Project Objective:</label>
-        <textarea
-          id="objective"
-          value={objective}
-          onChange={(e) => onObjectiveChange(e.target.value)}
-          placeholder="What do you want to achieve?"
-          rows={3}
-        />
-      </div>
-      
-      <div className={styles.inputGroup}>
-        <label htmlFor="currentItems">Current Items Available:</label>
-        <textarea
-          id="currentItems"
-          value={currentItems}
-          onChange={(e) => onCurrentItemsChange(e.target.value)}
-          placeholder="What components do you have? (e.g., breadboard, wires, battery)"
-          rows={3}
-        />
+        <div className={styles.inputGroup}>
+          <textarea
+            id="objective"
+            value={objective}
+            onChange={(e) => onObjectiveChange(e.target.value)}
+            placeholder="What are you trying to build?"
+            className={styles.textarea}
+          />
+          <VoiceInput 
+            onTranscription={handleVoiceInput}
+            objective={objective}
+            currentItems={currentItems}
+            pdfDocuments={pdfDocuments}
+            capturedImage={capturedImage}
+            detectedItems={detectedItems}
+          />
+        </div>
       </div>
 
       {pdfDocuments.length > 0 && (
-        <div className={styles.pdfList}>
+        <div className={styles.section}>
           <h3>Available Documentation:</h3>
-          <ul>
-            {pdfDocuments.map((pdf, index) => (
-              <li key={index}>{pdf}</li>
+          <ul className={styles.documentList}>
+            {pdfDocuments.map((doc, index) => (
+              <li key={index}>{doc}</li>
             ))}
           </ul>
         </div>

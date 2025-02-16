@@ -7,7 +7,7 @@ import PDFViewer from '../components/PDFViewer';
 import ProjectStatus from '../components/ProjectStatus';
 import ProjectDetails from '../components/ProjectDetails';
 import Head from 'next/head';
-import NextStepButton from '../components/NextStepButton';
+import VoiceInput from '../components/VoiceInput';
 
 interface ApiErrorResponse {
   error: string;
@@ -218,18 +218,14 @@ export default function Home() {
           pdfDocuments={pdfDocuments}
         />
 
-        <NextStepButton
-          objective={objective}
-          currentItems={currentItems}
-          pdfDocuments={pdfDocuments}
-        />
-
         <ProjectDetails
           objective={objective}
           currentItems={currentItems}
           pdfDocuments={pdfDocuments}
           onObjectiveChange={setObjective}
           onCurrentItemsChange={setCurrentItems}
+          capturedImage={capturedImage}
+          detectedItems={boundingBoxes.map(box => box.label)}
         />
 
         {/* Show PDFs at the top when they exist */}

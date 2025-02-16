@@ -1,7 +1,42 @@
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextApiRequest, NextApiResponse } from 'next';
-import Together from 'together-ai';
+import fs from 'fs';
+import path from 'path';
 
-const together = new Together(process.env.TOGETHER_API_KEY);
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
+
+interface NextStepRequest {
+  objective: string;
+  currentItems: string;
+  pdfDocuments: string[];
+  image?: string;
+  detectedItems?: string[];
+}
+
+async function searchPdfsForItems(pdfPaths: string[], items: string[]) {
+  try {
+    const searchResponse = await fetch('/api/searchPdfs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        pdfPaths,
+        searchTerms: items,
+      }),
+    });
+
+    if (!searchResponse.ok) {
+      throw new Error('Failed to search PDFs');
+    }
+
+    const searchResults = await searchResponse.json();
+    return searchResults.relevantText || '';
+  } catch (error) {
+    console.error('Error searching PDFs:', error);
+    return '';
+  }
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,32 +47,94 @@ export default async function handler(
   }
 
   try {
-    const { objective, currentItems, pdfDocuments } = req.body;
+    const { objective, currentItems, pdfDocuments, image, detectedItems } = req.body as NextStepRequest;
 
+    if (!objective) {
+      return res.status(400).json({ error: 'Objective is required' });
+    }
+
+    // Search PDFs for relevant content based on detected items
+    let pdfContent = '';
+    if (detectedItems && detectedItems.length > 0 && pdfDocuments.length > 0) {
+      pdfContent = await searchPdfsForItems(pdfDocuments, detectedItems);
+    }
+
+    // Initialize the Gemini model
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    // Create a detailed prompt for the next step
     const prompt = `
-Given the following project information:
+<think>
+Context:
+- Objective: ${objective}
+- Available Items: ${currentItems}
+- Documentation: ${pdfDocuments.join(', ')}
+${pdfContent ? `\nRelevant Documentation Content:\n${pdfContent}` : ''}
 
-Objective: ${objective}
-Available Items: ${currentItems}
-Documentation: ${pdfDocuments.join(', ')}
+Guidelines:
+1. Analyze current state
+2. Consider safety
+3. Check documentation
+4. Plan next action
+</think>
 
-Please provide the next specific, actionable step to help achieve this objective. 
-Consider safety precautions and reference relevant documentation when applicable.
-Keep the response concise and focused on the immediate next action.`;
+Provide ONE specific, actionable next step. Be direct and concise.
+Format:
+1. Action (1 sentence)
+2. Safety note (if needed, 1 sentence)
+3. Reference (if relevant, document/page)
 
-    const response = await together.chat.completions.create({
-      messages: [{ "role": "user", "content": prompt }],
-      model: "deepseek-ai/DeepSeek-R1",
-    });
+<think>
+Remember:
+- Be brief and clear
+- Focus on immediate next action only
+- No explanations or justifications
+- Maximum 3 sentences total
+</think>`;
 
-    return res.status(200).json({ 
-      result: response.choices?.[0]?.message?.content || 'No response generated' 
-    });
+    let result;
+    if (image) {
+      // Remove the data URL prefix to get just the base64 data
+      const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
+      
+      // Create the image part
+      const imagePart = {
+        inlineData: {
+          data: base64Data,
+          mimeType: 'image/jpeg'
+        }
+      };
+
+      // Generate content with both text and image
+      result = await model.generateContent({
+        contents: [{
+          role: "user",
+          parts: [
+            { text: prompt },
+            imagePart
+          ]
+        }]
+      });
+    } else {
+      // Generate content with just text
+      result = await model.generateContent({
+        contents: [{
+          role: "user",
+          parts: [{ text: prompt }]
+        }]
+      });
+    }
+
+    const response = await result.response;
+    const text = response.text();
+
+    return res.status(200).json({ result: text });
   } catch (error) {
     console.error('Error getting next step:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return res.status(500).json({ 
-      error: 'Failed to generate next step',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      error: 'Error generating next step',
+      details: errorMessage
     });
   }
 } 
