@@ -31,11 +31,52 @@
 }
 
 .error {
-  padding: 20px;
+  padding: 15px;
   background-color: #fee;
   border: 1px solid #fcc;
   border-radius: 8px;
   color: #c00;
   text-align: center;
-  margin: 20px 0;
-} 
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.uploadContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 2px dashed #dee2e6;
+}
+
+.uploadButton {
+  margin-top: 15px;
+  padding: 12px 24px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease;
+}
+
+.uploadButton:hover {
+  background-color: #218838;
+}
+
+@media (prefers-color-scheme: dark) {
+  .uploadContainer {
+    background-color: #2a2a2a;
+    border-color: #444;
+  }
+
+  .error {
+    background-color: #442;
+    border-color: #633;
+    color: #f66;
+  }
+}
