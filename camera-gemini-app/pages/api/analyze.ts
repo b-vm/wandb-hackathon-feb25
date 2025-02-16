@@ -45,7 +45,7 @@ export default async function handler(
     };
 
     // Generate content from the image
-    const prompt = "What devices do you see in this image? Please describe them all in detail.";
+    const prompt = "For every device you see in this image list the following: brand, model, and a description of the device. output in JSON format";
     const result = await model.generateContent({
       contents: [{
         role: "user",
