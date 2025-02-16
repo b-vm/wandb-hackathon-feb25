@@ -32,23 +32,7 @@ export default function ProjectDetails({
     { id: 2, text: "LED Strip", completed: false },
     { id: 3, text: "Breadboard", completed: false }
   ]);
-  const [loading, setLoading] = useState<number | null>(null);
   const [showSAMOutput, setShowSAMOutput] = useState(false);
-  const [samMetadata, setSamMetadata] = useState(null);
-
-  useEffect(() => {
-    // Load the pi1.json metadata when component mounts
-    const loadSAMMetadata = async () => {
-      try {
-        const response = await fetch('/pi1.json');
-        const data = await response.json();
-        setSamMetadata(data);
-      } catch (error) {
-        console.error('Error loading SAM metadata:', error);
-      }
-    };
-    loadSAMMetadata();
-  }, []);
 
   const handleVoiceInput = (text: string) => {
     onObjectiveChange(text);
@@ -56,7 +40,6 @@ export default function ProjectDetails({
 
   const handleAgentSearch = async (todoId: number, todoText: string) => {
     try {
-      setLoading(todoId);
       const response = await fetch('/api/agentSearch', {
         method: 'POST',
         headers: {
@@ -73,8 +56,6 @@ export default function ProjectDetails({
       console.log('Search results:', data);
     } catch (error) {
       console.error('Error performing agent search:', error);
-    } finally {
-      setLoading(null);
     }
   };
 
@@ -123,11 +104,10 @@ export default function ProjectDetails({
                 </span>
               </div>
               <button
-                className={`${styles.agentSearchButton} ${loading === todo.id ? styles.loading : ''}`}
+                className={styles.agentSearchButton}
                 onClick={() => handleAgentSearch(todo.id, todo.text)}
-                disabled={loading !== null}
               >
-                {loading === todo.id ? 'Searching...' : 'Search with Agent'}
+                Search with Agent
               </button>
             </div>
           ))}
@@ -160,12 +140,6 @@ export default function ProjectDetails({
               alt="SAM Output"
               className={styles.samImage}
             />
-            {samMetadata && (
-              <div className={styles.metadata}>
-                <h3>Bounding Box Data:</h3>
-                <pre>{JSON.stringify(samMetadata, null, 2)}</pre>
-              </div>
-            )}
           </div>
         )}
       </div>
