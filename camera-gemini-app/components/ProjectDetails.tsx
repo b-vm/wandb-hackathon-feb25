@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '../styles/ProjectDetails.module.css';
 import VoiceInput from './VoiceInput';
 
@@ -33,6 +33,22 @@ export default function ProjectDetails({
     { id: 3, text: "Breadboard", completed: false }
   ]);
   const [loading, setLoading] = useState<number | null>(null);
+  const [showSAMOutput, setShowSAMOutput] = useState(false);
+  const [samMetadata, setSamMetadata] = useState(null);
+
+  useEffect(() => {
+    // Load the pi1.json metadata when component mounts
+    const loadSAMMetadata = async () => {
+      try {
+        const response = await fetch('/pi1.json');
+        const data = await response.json();
+        setSamMetadata(data);
+      } catch (error) {
+        console.error('Error loading SAM metadata:', error);
+      }
+    };
+    loadSAMMetadata();
+  }, []);
 
   const handleVoiceInput = (text: string) => {
     onObjectiveChange(text);
@@ -128,6 +144,31 @@ export default function ProjectDetails({
           </ul>
         </div>
       )}
+
+      <div className={styles.samSection}>
+        <button 
+          className={styles.samButton}
+          onClick={() => setShowSAMOutput(!showSAMOutput)}
+        >
+          {showSAMOutput ? 'Hide SAM Output' : 'Show SAM Output'}
+        </button>
+
+        {showSAMOutput && (
+          <div className={styles.samOutput}>
+            <img 
+              src="/output_pi3.jpg" 
+              alt="SAM Output"
+              className={styles.samImage}
+            />
+            {samMetadata && (
+              <div className={styles.metadata}>
+                <h3>Bounding Box Data:</h3>
+                <pre>{JSON.stringify(samMetadata, null, 2)}</pre>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 } 
