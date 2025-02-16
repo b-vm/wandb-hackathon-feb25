@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextApiRequest, NextApiResponse } from 'next';
-import * as weave from 'weave';
+//import * as weave from 'weave';
 
 
 // Initialize the Gemini API with your API key
@@ -58,7 +58,7 @@ export default async function handler(
     // Remove the data URL prefix to get just the base64 data
     const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
 
-    await weave.init('camera-gemini-app');
+//await weave.init('camera-gemini-app');
     // Initialize the Gemini 1.5 Flash model
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
