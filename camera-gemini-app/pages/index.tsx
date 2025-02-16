@@ -101,8 +101,8 @@ export default function Home() {
   const handleImageCapture = async (imageData: string) => {
     try {
       setCapturedImage(imageData);
-      setRawDetections([]); // Clear previous detections
-      setBoundingBoxes([]); // Clear previous boxes
+      setRawDetections([]);
+      setBoundingBoxes([]);
       
       const response = await fetch('/api/analyze', {
         method: 'POST',
@@ -111,7 +111,13 @@ export default function Home() {
         },
         body: JSON.stringify({ 
           image: imageData,
-          prompt: 'Detect items, with no more than 20 items. Output a json list where each entry contains the 2D bounding box in "box_2d" as an array [x1, y1, x2, y2] representing the top-left and bottom-right coordinates, and a text label in "label". If you detect any electronic components or devices, include their model numbers in the label.',
+          prompt: `Analyze this image of electronic components and devices. For each item:
+1. Identify the specific product name/type (e.g., "Raspberry Pi 4", "Arduino Uno", "ESP32 DevKit")
+2. Output a json list where each entry contains:
+   - "box_2d": [x1, y1, x2, y2] for the bounding box
+   - "label": Full descriptive name of the component
+   - "product_name": The specific product name/type if identified
+Maximum 20 items. Focus on identifying complete product names rather than just model numbers.`,
           objective,
           currentItems,
           pdfDocuments: pdfPaths
@@ -152,28 +158,34 @@ export default function Home() {
         if (Array.isArray(jsonResult)) {
           setRawDetections(jsonResult);
           
-          // Look for potential model numbers in the detected items
-          const potentialModel = jsonResult.find(item => 
-            /[A-Za-z0-9]+-[A-Za-z0-9]+/.test(item.label) || // Matches patterns like "ABC-123"
-            /[A-Za-z]{2,}[0-9]{3,}/.test(item.label) ||     // Matches patterns like "ESP32" or "Arduino328"
-            item.label.includes("Model:") ||                 // Explicit model labels
-            item.label.toLowerCase().includes("board") ||     // Common electronics terms
-            item.label.toLowerCase().includes("module")
-          )?.label;
+          // Look for items with product names
+          const deviceWithProduct = jsonResult.find(item => 
+            item.product_name || // Check for explicit product name field
+            item.label.toLowerCase().includes('raspberry pi') ||
+            item.label.toLowerCase().includes('arduino') ||
+            item.label.toLowerCase().includes('esp') ||
+            item.label.toLowerCase().includes('board') ||
+            item.label.toLowerCase().includes('kit')
+          );
 
-          if (potentialModel) {
-            setCurrentModelName(potentialModel);
-            // Automatically search for PDFs
+          if (deviceWithProduct) {
+            const productName = deviceWithProduct.product_name || deviceWithProduct.label;
+            setCurrentModelName(productName); // We're reusing currentModelName state for product name
+            
+            // Search for PDFs with the product name
             const pdfResponse = await fetch('/api/getPdfs', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ modelName: potentialModel }),
+              body: JSON.stringify({ 
+                modelName: productName, // The API endpoint still expects 'modelName'
+                deviceType: deviceWithProduct.label // Additional context
+              }),
             });
 
-            const pdfData = await pdfResponse.json();
             if (pdfResponse.ok) {
+              const pdfData = await pdfResponse.json();
               handlePdfComplete(pdfData.result);
             }
           }
