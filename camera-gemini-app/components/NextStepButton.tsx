@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '../styles/NextStepButton.module.css';
 
 interface NextStepButtonProps {
@@ -8,10 +8,76 @@ interface NextStepButtonProps {
 }
 
 export default function NextStepButton({ objective, currentItems, pdfDocuments }: NextStepButtonProps) {
-  const [nextStep, setNextStep] = useState<string>('');
   const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState('');
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  const getNextStep = async () => {
+  // Clean text by removing content within <think> tags
+  const cleanThinkTags = (text: string): string => {
+    return text.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+  };
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audioElement) {
+        audioElement.pause();
+        URL.revokeObjectURL(audioElement.src);
+      }
+    };
+  }, [audioElement]);
+
+  const playAudio = async (text: string) => {
+    try {
+      // Stop any currently playing audio
+      if (audioElement) {
+        audioElement.pause();
+        URL.revokeObjectURL(audioElement.src);
+      }
+
+      // Clean the text before sending to speech API
+      const cleanedText = cleanThinkTags(text);
+      if (!cleanedText) return; // Don't make API call if no text to speak
+
+      const speechResponse = await fetch('/api/speak', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: cleanedText }),
+      });
+
+      if (!speechResponse.ok) {
+        throw new Error('Failed to generate speech');
+      }
+
+      const audioBlob = await speechResponse.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      const audio = new Audio(audioUrl);
+      
+      // Add event listeners
+      audio.addEventListener('play', () => setIsPlaying(true));
+      audio.addEventListener('ended', () => {
+        setIsPlaying(false);
+        URL.revokeObjectURL(audioUrl);
+      });
+      audio.addEventListener('pause', () => setIsPlaying(false));
+      audio.addEventListener('error', (e) => {
+        console.error('Audio playback error:', e);
+        setIsPlaying(false);
+        URL.revokeObjectURL(audioUrl);
+      });
+
+      setAudioElement(audio);
+      await audio.play();
+    } catch (error) {
+      console.error('Error playing speech:', error);
+    }
+  };
+
+  const handleClick = async () => {
     setLoading(true);
     try {
       const response = await fetch('/api/getNextStep', {
@@ -26,16 +92,21 @@ export default function NextStepButton({ objective, currentItems, pdfDocuments }
         }),
       });
 
-      const data = await response.json();
-      
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to get next step');
+        throw new Error('Failed to get next step');
       }
 
-      setNextStep(data.result);
+      const data = await response.json();
+      
+      // Clean the text before setting it
+      const cleanedResult = cleanThinkTags(data.result);
+      setResult(cleanedResult);
+
+      // Play the audio with cleaned text
+      await playAudio(data.result);
     } catch (error) {
-      console.error('Error getting next step:', error);
-      setNextStep('Error: Failed to generate next step. Please try again.');
+      console.error('Error:', error);
+      setResult('Error getting next step. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -44,16 +115,21 @@ export default function NextStepButton({ objective, currentItems, pdfDocuments }
   return (
     <div className={styles.container}>
       <button 
-        onClick={getNextStep}
+        onClick={handleClick} 
         disabled={loading || !objective}
         className={styles.button}
       >
-        {loading ? 'Thinking...' : 'Get Next Step'}
+        {loading ? 'Getting Next Step...' : 'What Should I Do Next?'}
       </button>
-      {nextStep && (
-        <div className={styles.stepDisplay}>
+      {result && (
+        <div className={styles.result}>
           <h3>Next Step:</h3>
-          <p>{nextStep}</p>
+          <p>{result}</p>
+          {isPlaying && (
+            <div className={styles.audioIndicator}>
+              🔊 Speaking...
+            </div>
+          )}
         </div>
       )}
     </div>

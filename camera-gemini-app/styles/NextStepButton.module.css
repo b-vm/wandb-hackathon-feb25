@@ -1,29 +1,50 @@
 .container {
-  margin: 1rem 0;
-  padding: 1rem;
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  text-align: center;
 }
 
 .button {
-  background-color: #0070f3;
+  padding: 12px 24px;
+  font-size: 16px;
+  background-color: #007bff;
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
-  font-size: 1rem;
+  border-radius: 25px;
   cursor: pointer;
   transition: background-color 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .button:hover {
-  background-color: #0051b3;
+  background-color: #0056b3;
 }
 
 .button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+
+.result {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.result h3 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.result p {
+  color: #666;
+  line-height: 1.5;
+  margin: 0;
 }
 
 .stepDisplay {
@@ -41,4 +62,31 @@
 .stepDisplay p {
   margin: 0;
   line-height: 1.5;
+}
+
+.audioIndicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #28a745;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
 } 
