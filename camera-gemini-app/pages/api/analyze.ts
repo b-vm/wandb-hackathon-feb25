@@ -4,9 +4,20 @@ import { NextApiRequest, NextApiResponse } from 'next';
 // Initialize the Gemini API with your API key
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
 
+interface ErrorResponse {
+  error: string;
+  details?: string;
+}
+
+interface SuccessResponse {
+  result: string;
+}
+
+type ApiResponse = ErrorResponse | SuccessResponse;
+
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse<ApiResponse>
 ) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -49,11 +60,12 @@ export default async function handler(
     const text = response.text();
 
     return res.status(200).json({ result: text });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error processing image:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return res.status(500).json({ 
       error: 'Error processing image',
-      details: error.message || 'Unknown error'
+      details: errorMessage
     });
   }
 }
