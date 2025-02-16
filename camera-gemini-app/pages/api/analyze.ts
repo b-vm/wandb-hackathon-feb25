@@ -21,32 +21,39 @@ export default async function handler(
 
     // Remove the data URL prefix to get just the base64 data
     const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
-    
-    // Convert base64 to Uint8Array
-    const imageData = new Uint8Array(Buffer.from(base64Data, 'base64'));
 
-    // Initialize the Gemini Pro Vision model
-    const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
+    // Initialize the Gemini 1.5 Flash model
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    // Create image part from binary data
+    // Prepare the image part for Gemini
     const imagePart = {
       inlineData: {
-        data: Buffer.from(imageData).toString('base64'),
+        data: base64Data,
         mimeType: 'image/jpeg'
       },
     };
 
     // Generate content from the image
-    const result = await model.generateContent([
-      "What devices do you see in this image? Please describe them all in detail.",
-      imagePart
-    ]);
+    const prompt = "What devices do you see in this image? Please describe them all in detail.";
+    const result = await model.generateContent({
+      contents: [{
+        role: "user",
+        parts: [
+          { text: prompt },
+          imagePart
+        ]
+      }]
+    });
+
     const response = await result.response;
     const text = response.text();
 
     return res.status(200).json({ result: text });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error processing image:', error);
-    return res.status(500).json({ error: 'Error processing image' });
+    return res.status(500).json({ 
+      error: 'Error processing image',
+      details: error.message || 'Unknown error'
+    });
   }
 }

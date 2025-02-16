@@ -1,15 +1,14 @@
 .cameraContainer {
-  width: 100%;
-  height: 50vh;
   position: relative;
-  overflow: hidden;
-  background: #000;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .video {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  border-radius: 8px;
 }
 
 .captureButton {
@@ -18,10 +17,25 @@
   left: 50%;
   transform: translateX(-50%);
   padding: 12px 24px;
-  background: #ffffff;
+  background-color: #007bff;
+  color: white;
   border: none;
   border-radius: 25px;
-  font-size: 16px;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.captureButton:hover {
+  background-color: #0056b3;
+}
+
+.error {
+  padding: 20px;
+  background-color: #fee;
+  border: 1px solid #fcc;
+  border-radius: 8px;
+  color: #c00;
+  text-align: center;
+  margin: 20px 0;
 } 

@@ -8,6 +8,7 @@ interface CameraComponentProps {
 export default function CameraComponent({ onCapture }: CameraComponentProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     initializeCamera();
@@ -23,9 +24,11 @@ export default function CameraComponent({ onCapture }: CameraComponentProps) {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         setIsInitialized(true);
+        setError('');
       }
     } catch (error) {
       console.error('Error accessing camera:', error);
+      setError('Unable to access camera. Please make sure you have granted camera permissions.');
     }
   };
 
@@ -46,16 +49,22 @@ export default function CameraComponent({ onCapture }: CameraComponentProps) {
 
   return (
     <div className={styles.cameraContainer}>
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        className={styles.video}
-      />
-      {isInitialized && (
-        <button onClick={captureImage} className={styles.captureButton}>
-          Take Photo
-        </button>
+      {error ? (
+        <div className={styles.error}>{error}</div>
+      ) : (
+        <>
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            className={styles.video}
+          />
+          {isInitialized && (
+            <button onClick={captureImage} className={styles.captureButton}>
+              Take Photo
+            </button>
+          )}
+        </>
       )}
     </div>
   );

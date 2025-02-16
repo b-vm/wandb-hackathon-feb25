@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import CameraComponent from '../components/CameraComponent';
 import ResultComponent from '../components/ResultComponent';
 import styles from '../styles/Home.module.css';
@@ -17,19 +17,17 @@ export default function Home() {
       });
       
       const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.details || data.error || 'Failed to process image');
+      }
+      
       setResult(data.result);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error processing image:', error);
-      setResult('Error processing image. Please try again.');
+      setResult(`Error: ${error.message || 'Failed to process image. Please try again.'}`);
     }
   };
-
-  useEffect(() => {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    if (!isIOS) {
-      alert('This application is only supported on iOS devices.');
-    }
-  }, []);
 
   return (
     <div className={styles.container}>
