@@ -1,0 +1,48 @@
+.statusContainer {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.statusSection {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.statusSection h2 {
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.statusItem {
+  margin-bottom: 1rem;
+}
+
+.statusItem strong {
+  display: block;
+  color: #555;
+  margin-bottom: 0.25rem;
+}
+
+.statusItem p {
+  margin: 0;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 4px;
+}
+
+.statusItem ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.statusItem li {
+  padding: 0.25rem 0;
+} 

@@ -166,3 +166,69 @@ a.secondary {
     filter: invert();
   }
 }
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  min-height: 100vh;
+  gap: 20px;
+}
+
+.pdfSection {
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 40px;
+}
+
+.pdfSection h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.mainSection {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.modelInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  width: 100%;
+}
+
+.modelInfo p {
+  margin: 0;
+  font-size: 1.1em;
+  font-weight: 500;
+}
+
+.pdfResult {
+  width: 100%;
+  max-width: 800px;
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+.pdfResult pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+  padding: 10px;
+  background-color: white;
+  border-radius: 4px;
+}

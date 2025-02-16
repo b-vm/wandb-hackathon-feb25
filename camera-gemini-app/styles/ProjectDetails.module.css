@@ -1,0 +1,41 @@
+.container {
+  padding: 1rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.inputGroup {
+  margin-bottom: 1rem;
+}
+
+.inputGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.inputGroup textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.pdfList {
+  margin-top: 1rem;
+}
+
+.pdfList h3 {
+  margin-bottom: 0.5rem;
+}
+
+.pdfList ul {
+  list-style: none;
+  padding: 0;
+}
+
+.pdfList li {
+  padding: 0.25rem 0;
+} 
