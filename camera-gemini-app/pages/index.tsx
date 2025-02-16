@@ -111,7 +111,7 @@ export default function Home() {
         },
         body: JSON.stringify({ 
           image: imageData,
-          prompt: 'Detect items, with no more than 20 items. Output a json list where each entry contains the 2D bounding box in "box_2d" as an array [x1, y1, x2, y2] representing the top-left and bottom-right coordinates, and a text label in "label".',
+          prompt: 'Detect items, with no more than 20 items. Output a json list where each entry contains the 2D bounding box in "box_2d" as an array [x1, y1, x2, y2] representing the top-left and bottom-right coordinates, and a text label in "label". If you detect any electronic components or devices, include their model numbers in the label.',
           objective,
           currentItems,
           pdfDocuments: pdfPaths
@@ -151,6 +151,32 @@ export default function Home() {
         
         if (Array.isArray(jsonResult)) {
           setRawDetections(jsonResult);
+          
+          // Look for potential model numbers in the detected items
+          const potentialModel = jsonResult.find(item => 
+            /[A-Za-z0-9]+-[A-Za-z0-9]+/.test(item.label) || // Matches patterns like "ABC-123"
+            /[A-Za-z]{2,}[0-9]{3,}/.test(item.label) ||     // Matches patterns like "ESP32" or "Arduino328"
+            item.label.includes("Model:") ||                 // Explicit model labels
+            item.label.toLowerCase().includes("board") ||     // Common electronics terms
+            item.label.toLowerCase().includes("module")
+          )?.label;
+
+          if (potentialModel) {
+            setCurrentModelName(potentialModel);
+            // Automatically search for PDFs
+            const pdfResponse = await fetch('/api/getPdfs', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ modelName: potentialModel }),
+            });
+
+            const pdfData = await pdfResponse.json();
+            if (pdfResponse.ok) {
+              handlePdfComplete(pdfData.result);
+            }
+          }
         } else {
           console.log('Frontend - JSON result is not an array');
         }
@@ -231,7 +257,16 @@ export default function Home() {
         {/* Show PDFs at the top when they exist */}
         {pdfPaths.length > 0 && (
           <div className={styles.pdfSection}>
-            <h2>Device Datasheets</h2>
+            <h2>Device Documentation</h2>
+            <div className={styles.pdfInfo}>
+              <p>Found {pdfPaths.length} datasheet{pdfPaths.length > 1 ? 's' : ''} for {currentModelName}</p>
+              {pdfResult && (
+                <details className={styles.searchDetails}>
+                  <summary>View Search Results</summary>
+                  <pre className={styles.searchResults}>{pdfResult}</pre>
+                </details>
+              )}
+            </div>
             <PDFViewer pdfPaths={pdfPaths} />
           </div>
         )}

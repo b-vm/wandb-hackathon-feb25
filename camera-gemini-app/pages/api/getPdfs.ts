@@ -110,7 +110,7 @@ def get_page_content(url):
 get_page_content.counter = 1
 
 def main():
-    query = "${modelName} datasheet"
+    query = "${modelName} datasheet filetype:pdf"
     output_file = r"${normalizedOutputPath}"  # Use raw string for Windows path
     
     print("Searching for URLs...")

@@ -1,16 +1,25 @@
 .pdfContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
   width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .pdfWrapper {
-  border: 1px solid #ccc;
-  padding: 1rem;
+  margin-bottom: 30px;
+  background: white;
+  padding: 15px;
   border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.pdfWrapper h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 1.2rem;
 }
 
 .pdfControls {
@@ -65,4 +74,26 @@
   width: 100%;
   height: 800px;
   border: none;
+  border-radius: 4px;
+  background: white;
+}
+
+@media (max-width: 768px) {
+  .pdfFrame {
+    height: 500px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .pdfContainer {
+    background: #2a2a2a;
+  }
+
+  .pdfWrapper {
+    background: #333;
+  }
+
+  .pdfWrapper h3 {
+    color: #fff;
+  }
 } 

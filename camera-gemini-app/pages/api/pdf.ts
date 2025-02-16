@@ -10,8 +10,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    // Ensure the path is relative to the project root
-    const filePath = path.join(process.cwd(), pdfPath);
+    // Ensure the path is relative to the public directory
+    const filePath = path.join(process.cwd(), 'public', pdfPath);
     
     // Check if file exists
     if (!fs.existsSync(filePath)) {

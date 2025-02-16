@@ -11,7 +11,7 @@ export default function PDFViewer({ pdfPaths }: PDFViewerProps) {
         <div key={pdfPath} className={styles.pdfWrapper}>
           <h3>PDF Document {index + 1}</h3>
           <iframe
-            src={`/${pdfPath}`}
+            src={`/api/pdf?path=${encodeURIComponent(pdfPath)}`}
             className={styles.pdfFrame}
             title={`PDF Document ${index + 1}`}
           />
