@@ -72,23 +72,16 @@ Context:
 ${pdfContent ? `\nRelevant Documentation Content:\n${pdfContent}` : ''}
 
 Guidelines:
-1. Analyze current state
-2. Consider safety
-3. Check documentation
-4. Plan next action
+1. identify objects in image
+2. Check documentation
+3. answer user questions
+4. provide instruction for how to proceed
+
 </think>
-
-Provide ONE specific, actionable next step. Be direct and concise.
-Format:
-1. Action (1 sentence)
-2. Safety note (if needed, 1 sentence)
-3. Reference (if relevant, document/page)
-
+Answer the user's question. Do not instruct the user to look shit up. Answer the question.
 <think>
 Remember:
 - Be brief and clear
-- Focus on immediate next action only
-- No explanations or justifications
 - Maximum 3 sentences total
 </think>`;
 
