@@ -16,12 +16,12 @@ class PipelineOutput:
 
 def get_device() -> torch.device:
     """Get the appropriate device (CPU or CUDA) based on availability."""
-    # if torch.cuda.is_available():
-    #     try:
-    #         torch.zeros(1).cuda()
-    #         return torch.device('cuda')
-    #     except RuntimeError:
-    #         return torch.device('cpu')
+    if torch.cuda.is_available():
+        try:
+            torch.zeros(1).cuda()
+            return torch.device('cuda')
+        except RuntimeError:
+            return torch.device('cpu')
     return torch.device('cpu')
 
 @step(enable_cache=False)
