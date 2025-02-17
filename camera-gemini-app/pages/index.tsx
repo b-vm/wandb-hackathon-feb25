@@ -49,9 +49,20 @@ export default function Home() {
       setRawDetections(analysisData.detections || []);
       const formattedResult = JSON.stringify(analysisData, null, 2);
       setAnalysisResult(formattedResult);
+
+      // Extract product name from detections for PDF lookup
+      const detections = analysisData.detections || [];
+      if (detections.length > 0) {
+        // Use product_name if available, otherwise use label
+        const productName = detections[0].product_name || detections[0].label;
+        setCurrentModelName(productName);
+      } else {
+        setCurrentModelName('');
+      }
     } else {
       setRawDetections([]);
       setAnalysisResult('');
+      setCurrentModelName('');
     }
   };
 
@@ -124,9 +135,15 @@ export default function Home() {
         </div>
 
         {pdfResult && (
-          <div className={styles.pdfResult}>
-            <h3>PDF Search Results:</h3>
-            <pre>{pdfResult}</pre>
+          <div className={styles.pdfSection}>
+            <h3>Documentation</h3>
+            <div className={styles.pdfContent}>
+              <PDFViewer pdfPaths={pdfPaths} />
+              <div className={styles.pdfInfo}>
+                <h4>Search Results</h4>
+                <pre>{pdfResult}</pre>
+              </div>
+            </div>
           </div>
         )}
       </main>

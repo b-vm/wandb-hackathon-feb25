@@ -203,33 +203,72 @@ a.secondary {
 
 .pdfSection {
   width: 100%;
-  max-width: 1200px;
-  margin: 20px auto;
-  padding: 20px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  background: var(--card-background-color, #242424);
+  border: 1px solid var(--muted-border-color, #374956);
+  border-radius: 16px;
+  margin-top: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
 }
 
-.pdfSection h2 {
-  color: #2c3e50;
-  margin-bottom: 20px;
-  font-size: 1.8rem;
-  border-bottom: 2px solid #3498db;
-  padding-bottom: 10px;
+.pdfSection h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--h2-color, #fff);
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.5px;
+}
+
+.pdfContent {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
 }
 
 .pdfInfo {
-  margin-bottom: 20px;
-  padding: 15px;
-  background: #f8f9fa;
-  border-radius: 8px;
+  background: var(--background-color, #1a1a1a);
+  padding: 1rem;
+  border-radius: 12px;
 }
 
-.pdfInfo p {
+.pdfInfo h4 {
+  font-size: 1rem;
+  color: var(--muted-color, #a3b4c0);
+  margin: 0 0 1rem 0;
+}
+
+.pdfInfo pre {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--color, #fff);
+  white-space: pre-wrap;
+  word-break: break-word;
   margin: 0;
-  color: #2c3e50;
-  font-size: 1.1rem;
+}
+
+/* Light mode overrides */
+@media (prefers-color-scheme: light) {
+  .pdfSection {
+    background: #ffffff;
+    border-color: #e5e7eb;
+  }
+
+  .pdfInfo {
+    background: #f8fafc;
+  }
+
+  .pdfInfo pre {
+    color: #1a1a1a;
+  }
+}
+
+@media (max-width: 768px) {
+  .pdfContent {
+    grid-template-columns: 1fr;
+  }
 }
 
 .searchDetails {
