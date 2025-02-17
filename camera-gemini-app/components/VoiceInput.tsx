@@ -65,23 +65,28 @@ export default function VoiceInput({ onTranscription, disabled, objective, curre
               });
 
               if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.details || 'Failed to transcribe audio');
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                  const errorData = await response.json();
+                  await handleTranscriptionError(response.status);
+                } else {
+                  console.error('Non-JSON transcription error response:', await response.text());
+                  await handleTranscriptionError(response.status);
+                }
+                return; // Exit early after handling error
               }
 
               const data = await response.json();
               if (data.text) {
                 onTranscription(data.text);
                 setError('');
-                
-                // Automatically get next step after transcription
                 await getNextStep(data.text);
               } else {
-                throw new Error('No transcription received');
+                await handleTranscriptionError(response.status);
               }
             } catch (error) {
-              console.error('Error transcribing:', error);
-              setError(error instanceof Error ? error.message : 'Failed to transcribe audio. Please try again.');
+              console.error('Error in transcription:', error);
+              await provideFallbackResponse("I'm having trouble processing your request. Please try again.");
             } finally {
               setIsProcessing(false);
             }
@@ -90,13 +95,15 @@ export default function VoiceInput({ onTranscription, disabled, objective, curre
           reader.onerror = () => {
             setError('Error reading audio data');
             setIsProcessing(false);
+            provideFallbackResponse("There was an error processing the audio. Please try again.");
           };
 
           reader.readAsDataURL(audioBlob);
         } catch (error) {
           console.error('Error processing audio:', error);
-          setError(error instanceof Error ? error.message : 'Error processing audio');
+          setError('Error processing audio');
           setIsProcessing(false);
+          provideFallbackResponse("There was an error processing the audio. Please try again.");
         }
       };
 
@@ -134,7 +141,15 @@ export default function VoiceInput({ onTranscription, disabled, objective, curre
       });
 
       if (!response.ok) {
-        throw new Error('Failed to get next step');
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to get next step');
+        } else {
+          const errorText = await response.text();
+          console.error('Non-JSON error response:', errorText);
+          throw new Error(`Server error: ${response.status}`);
+        }
       }
 
       const data = await response.json();
@@ -149,7 +164,15 @@ export default function VoiceInput({ onTranscription, disabled, objective, curre
       });
 
       if (!speechResponse.ok) {
-        throw new Error('Failed to generate speech');
+        const contentType = speechResponse.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+          const errorData = await speechResponse.json();
+          throw new Error(errorData.message || 'Failed to generate speech');
+        } else {
+          const errorText = await speechResponse.text();
+          console.error('Non-JSON speech error response:', errorText);
+          throw new Error(`Speech server error: ${speechResponse.status}`);
+        }
       }
 
       const audioBlob = await speechResponse.blob();
@@ -157,9 +180,46 @@ export default function VoiceInput({ onTranscription, disabled, objective, curre
       await audio.play();
 
     } catch (error) {
-      console.error('Error:', error);
-      setError('Error getting next step. Please try again.');
+      console.error('Error in getNextStep:', error);
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.');
     }
+  };
+
+  const provideFallbackResponse = async (message: string) => {
+    try {
+      // Play a fallback audio response
+      const speechResponse = await fetch('/api/speak', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          text: "I apologize, but I'm having trouble connecting to the network. Please try again in a moment." 
+        }),
+      });
+
+      if (speechResponse.ok) {
+        const audioBlob = await speechResponse.blob();
+        const audio = new Audio(URL.createObjectURL(audioBlob));
+        await audio.play();
+      } else {
+        console.error('Could not play fallback audio');
+      }
+    } catch (error) {
+      console.error('Error playing fallback audio:', error);
+    }
+  };
+
+  const handleTranscriptionError = async (status: number) => {
+    let message = "I'm having trouble understanding you right now. Please try again.";
+    if (status === 500) {
+      message = "The server is experiencing issues. Please try again in a moment.";
+    } else if (status === 404) {
+      message = "The transcription service is currently unavailable.";
+    }
+    
+    setError(message);
+    await provideFallbackResponse(message);
   };
 
   return (

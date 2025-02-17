@@ -1,40 +1,56 @@
 .statusContainer {
-  background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 2rem;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  background: var(--background-color, #1a1a1a);
+  border: 1px solid var(--muted-border-color, #374956);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin: 2rem auto;
+  width: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
 }
 
 .statusSection {
-  max-width: 800px;
-  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
 }
 
 .statusSection h2 {
-  margin-bottom: 1rem;
-  color: #333;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--h2-color, #fff);
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.5px;
+  grid-column: 1 / -1;
 }
 
 .statusItem {
-  margin-bottom: 1rem;
+  padding: 1rem;
+  background: var(--card-background-color, #242424);
+  border-radius: 12px;
+  margin-bottom: 0;
+  transition: all 0.2s ease;
+}
+
+.statusItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .statusItem strong {
   display: block;
-  color: #555;
-  margin-bottom: 0.25rem;
+  color: var(--muted-color, #a3b4c0);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
 }
 
 .statusItem p {
   margin: 0;
-  padding: 0.5rem;
-  background: white;
-  border-radius: 4px;
+  color: var(--color, #fff);
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 .statusItem ul {
@@ -44,5 +60,62 @@
 }
 
 .statusItem li {
-  padding: 0.25rem 0;
+  padding: 0.5rem 0;
+  color: var(--color, #fff);
+  font-size: 0.95rem;
+  border-bottom: 1px solid var(--muted-border-color, #374956);
+}
+
+.statusItem li:last-child {
+  border-bottom: none;
+}
+
+/* Light mode overrides */
+@media (prefers-color-scheme: light) {
+  .statusContainer {
+    background: #ffffff;
+    border-color: #e5e7eb;
+  }
+
+  .statusSection h2 {
+    color: #1a1a1a;
+  }
+
+  .statusItem {
+    background: #f8fafc;
+  }
+
+  .statusItem strong {
+    color: #4b5563;
+  }
+
+  .statusItem p,
+  .statusItem li {
+    color: #1a1a1a;
+  }
+
+  .statusItem li {
+    border-bottom-color: #e5e7eb;
+  }
+}
+
+/* Hover effects */
+.statusContainer:hover {
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Animation for status items */
+.statusItem {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 } 

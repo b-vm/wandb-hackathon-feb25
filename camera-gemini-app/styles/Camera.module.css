@@ -3,12 +3,36 @@
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--card-background-color, #242424);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .video {
   width: 100%;
   height: auto;
-  border-radius: 8px;
+  aspect-ratio: 4/3;
+  display: block;
+  object-fit: cover;
+}
+
+.imagePreview {
+  width: 100%;
+  max-width: 600px;
+  margin: 1rem auto;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--card-background-color, #242424);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.previewImage {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4/3;
+  display: block;
+  object-fit: contain;
 }
 
 .captureButton {
@@ -16,67 +40,78 @@
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 12px 24px;
-  background-color: #007bff;
-  color: white;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
   border: none;
-  border-radius: 25px;
+  border-radius: 12px;
   cursor: pointer;
-  font-size: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 100%);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 6px rgba(20, 184, 166, 0.3);
+  min-width: 140px;
 }
 
-.captureButton:hover {
-  background-color: #0056b3;
+.captureButton:hover:not(:disabled) {
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 6px 8px rgba(20, 184, 166, 0.4);
+}
+
+.captureButton:disabled {
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+  cursor: not-allowed;
+  transform: translateX(-50%);
+  box-shadow: none;
 }
 
 .error {
-  padding: 15px;
-  background-color: #fee;
-  border: 1px solid #fcc;
-  border-radius: 8px;
-  color: #c00;
-  text-align: center;
-  margin-bottom: 15px;
-  font-size: 14px;
+  color: #dc2626;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
 }
 
 .uploadContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 30px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  border: 2px dashed #dee2e6;
+  padding: 2rem;
+  text-align: center;
 }
 
 .uploadButton {
-  margin-top: 15px;
-  padding: 12px 24px;
-  background-color: #28a745;
-  color: white;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
   border: none;
-  border-radius: 25px;
+  border-radius: 12px;
   cursor: pointer;
-  font-size: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 100%);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 6px rgba(20, 184, 166, 0.2);
 }
 
-.uploadButton:hover {
-  background-color: #218838;
+.uploadButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(20, 184, 166, 0.3);
 }
 
+.uploadButton:disabled {
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Dark mode adjustments */
 @media (prefers-color-scheme: dark) {
-  .uploadContainer {
-    background-color: #2a2a2a;
-    border-color: #444;
-  }
-
   .error {
-    background-color: #442;
-    border-color: #633;
-    color: #f66;
+    color: #f87171;
   }
 }

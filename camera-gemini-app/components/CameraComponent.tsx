@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import styles from '../styles/Camera.module.css';
 
 interface CameraComponentProps {
-  onCapture: (imageData: string) => void;
+  onCapture: (imageData: string, analysisData?: any) => void;
 }
 
 const MAX_IMAGE_SIZE = 800; // Maximum width or height for the image
@@ -80,7 +80,47 @@ export default function CameraComponent({ onCapture }: CameraComponentProps) {
       context.drawImage(videoRef.current, 0, 0);
       const imageData = canvas.toDataURL('image/jpeg');
       const resizedImage = await resizeImage(imageData);
-      onCapture(resizedImage);
+      
+      try {
+        // First try to analyze the image
+        const response = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            image: resizedImage,
+            prompt: `Analyze this image of electronic components and devices. For each item:
+1. Identify the specific product name/type (e.g., "Raspberry Pi 4", "Arduino Uno", "ESP32 DevKit")
+2. Output a json list where each entry contains:
+   - "box_2d": [x1, y1, x2, y2] for the bounding box
+   - "label": Full descriptive name of the component
+   - "product_name": The specific product name/type if identified
+Maximum 20 items. Focus on identifying complete product names rather than just model numbers.`
+          }),
+        });
+
+        // If the response isn't OK or there's no JSON, just pass the image without analysis
+        if (!response.ok) {
+          console.log('No products detected in image, continuing with capture');
+          onCapture(resizedImage);
+          return;
+        }
+
+        try {
+          const data = await response.json();
+          // If we got valid JSON, pass both the image and the analysis
+          onCapture(resizedImage, data);
+        } catch (error) {
+          // If JSON parsing fails, just pass the image
+          console.log('Could not parse product data, continuing with capture');
+          onCapture(resizedImage);
+        }
+      } catch (error) {
+        // If the fetch fails, just pass the image
+        console.log('Image analysis failed, continuing with capture');
+        onCapture(resizedImage);
+      }
     }
   };
 
@@ -117,7 +157,7 @@ export default function CameraComponent({ onCapture }: CameraComponentProps) {
             style={{ display: 'none' }}
           />
           <button onClick={triggerFileUpload} className={styles.uploadButton}>
-            Upload Image
+            📁 Upload Image
           </button>
         </div>
       ) : (
@@ -130,7 +170,7 @@ export default function CameraComponent({ onCapture }: CameraComponentProps) {
           />
           {isInitialized && (
             <button onClick={captureImage} className={styles.captureButton}>
-              Take Photo
+              📸 Take Photo
             </button>
           )}
         </>
